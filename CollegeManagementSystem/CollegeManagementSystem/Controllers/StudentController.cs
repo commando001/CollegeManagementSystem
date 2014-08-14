@@ -47,13 +47,20 @@ namespace CollegeManagementSystem.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ID,LastName,FirstMidName,EnrollmentDate")] Student student)
-        {
-            if (ModelState.IsValid)
+        public ActionResult Create([Bind(Include = "LastName,FirstMidName,EnrollmentDate")] Student student) //the ID binding is removed since it is the primary key and set automatically by the database
+        {   
+            try //try catch block to catch errors that may arise
             {
-                db.Students.Add(student);
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    db.Students.Add(student);
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
+            }
+            catch(DataException /*dex*/)
+            {
+                ModelState.AddModelError("", "Unable to save changes.Try again, and if the problem persists see the system Administrator");
             }
 
             return View(student);
@@ -81,21 +88,33 @@ namespace CollegeManagementSystem.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "ID,LastName,FirstMidName,EnrollmentDate")] Student student)
         {
-            if (ModelState.IsValid)
+            try
             {
-                db.Entry(student).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    db.Entry(student).State = EntityState.Modified;
+                    db.SaveChanges();
+                    return RedirectToAction("Index");
+                }
             }
+            catch(DataException /*dex*/)
+            {
+                ModelState.AddModelError("", "Unable to save changes.Please try again. If the problem persists see the System Administator.");
+            }
+
             return View(student);
         }
 
         // GET: Students/Delete/5
-        public ActionResult Delete(int? id)
+        public ActionResult Delete(int? id, bool? saveChangesError=false)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            if(saveChangesError.GetValueOrDefault()) //is the saveChangesError is set to True an error message is displayed i.e when the HttpGet Delete is called after a previous HttpPost Delete failure
+            {
+                ViewBag.ErrorMessage = "Delete failed.  Try again, and if the problem persists see your system administrator.";
             }
             Student student = db.Students.Find(id);
             if (student == null)
@@ -106,16 +125,25 @@ namespace CollegeManagementSystem.Controllers
         }
 
         // POST: Students/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
+        public ActionResult Delete(int id) //DeleteConfirmed Replaced to Delete
         {
-            Student student = db.Students.Find(id);
-            db.Students.Remove(student);
-            db.SaveChanges();
+            try
+            {
+                Student student = db.Students.Find(id);
+                db.Students.Remove(student);
+                db.SaveChanges();
+             }
+            catch(DataException /*dex*/)
+            {
+                //Log the error. 
+                return RedirectToAction("Delete", new { id = id, saveChangesError = true });
+            }
             return RedirectToAction("Index");
         }
 
+        //ensures the connections are not left open. The connections are closed
         protected override void Dispose(bool disposing)
         {
             if (disposing)
