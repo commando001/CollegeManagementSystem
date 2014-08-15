@@ -9,16 +9,23 @@
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
+@using(Html.BeginForm())
+{
+    <p>
+        Find By Name: @Html.TextBox("searchString")
+        <input type="submit" value="Search" />
+   </p>
+}<hr />
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.LastName)
+           @Html.ActionLink("Last Name", "Index", new { sortOrder = ViewBag.NameSortParm })
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.FirstMidName)
+            First Name
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.EnrollmentDate)
+            @Html.ActionLink("Enrollment Date", "Index", new { sortOrder = ViewBag.DateSortParm})
         </th>
         <th></th>
     </tr>
