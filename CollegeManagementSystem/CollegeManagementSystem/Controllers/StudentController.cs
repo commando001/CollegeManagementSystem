@@ -9,19 +9,33 @@ using System.Web.Mvc;
 using CollegeManagementSystem.DAL;
 using CollegeManagementSystem.Models;
 
+using PagedList;
+using PagedList.Mvc;
+
 namespace CollegeManagementSystem.Controllers
 {
     public class StudentController : Controller
     {
         private CollegeContext db = new CollegeContext();
 
-        // GET: Students ..enable sorting...search functionality
-        public ActionResult Index(string sortOrder, string searchString)
+        // GET: Students ..enable sorting...search functionality...Paging
+        public ActionResult Index(string sortOrder, string currentFilter, string searchString, int? page)
         {
             ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
             ViewBag.DateSortParm = sortOrder == "Date" ? "date_desc" : "Date";
             var students = from s in db.Students
                            select s;
+            //paging
+            if(searchString != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+            ViewBag.CurrentFilter = searchString;
+
             //search functionality
             if(!String.IsNullOrEmpty(searchString))
             {
@@ -44,8 +58,10 @@ namespace CollegeManagementSystem.Controllers
                     students = students.OrderBy(s => s.LastName);
                     break;
             }
-
-            return View(students.ToList());
+            int pageSize = 3;
+            int pageNumber = (page ?? 1);
+            //return View(students.ToList());
+            return View(students.ToPagedList(pageNumber, pageSize));
         }
 
         // GET: Students/Details/5
