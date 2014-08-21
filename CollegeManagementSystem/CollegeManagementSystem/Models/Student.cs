@@ -3,6 +3,7 @@ using System.Collections.Generic;
 //using System.Linq;
 //using System.Web;
 
+using System.ComponentModel.DataAnnotations;
 
 namespace CollegeManagementSystem.Models
 {
@@ -11,6 +12,8 @@ namespace CollegeManagementSystem.Models
         public int ID { get; set; } //primary key
         public string LastName { get; set; }
         public string FirstMidName { get; set; }
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString="{0:yyyy-MM-dd}", ApplyFormatInEditMode=true)]
         public DateTime EnrollmentDate { get; set; }
 
         //navigation properties 
