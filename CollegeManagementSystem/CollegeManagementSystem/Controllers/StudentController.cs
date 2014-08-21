@@ -11,6 +11,7 @@ using CollegeManagementSystem.Models;
 
 using PagedList;
 using PagedList.Mvc;
+using System.Data.Entity.Infrastructure;    
 
 namespace CollegeManagementSystem.Controllers
 {
@@ -101,7 +102,7 @@ namespace CollegeManagementSystem.Controllers
                     return RedirectToAction("Index");
                 }
             }
-            catch(DataException /*dex*/)
+            catch(RetryLimitExceededException /*dex*/)
             {
                 ModelState.AddModelError("", "Unable to save changes.Try again, and if the problem persists see the system Administrator");
             }
@@ -140,7 +141,7 @@ namespace CollegeManagementSystem.Controllers
                     return RedirectToAction("Index");
                 }
             }
-            catch(DataException /*dex*/)
+            catch(RetryLimitExceededException /*dex*/)
             {
                 ModelState.AddModelError("", "Unable to save changes.Please try again. If the problem persists see the System Administator.");
             }
@@ -178,7 +179,7 @@ namespace CollegeManagementSystem.Controllers
                 db.Students.Remove(student);
                 db.SaveChanges();
              }
-            catch(DataException /*dex*/)
+            catch(RetryLimitExceededException /*dex*/)
             {
                 //Log the error. 
                 return RedirectToAction("Delete", new { id = id, saveChangesError = true });
