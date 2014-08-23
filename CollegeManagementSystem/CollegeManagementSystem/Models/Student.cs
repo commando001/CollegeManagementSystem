@@ -15,7 +15,7 @@ namespace CollegeManagementSystem.Models
         [StringLength(50)]
         public string LastName { get; set; }
 
-        [Column("FirstName")]
+        [Column("FirstName")] //changed the table name in the database to FirstName but maps to FirstMidName
         [StringLength(50, ErrorMessage="First Name cannot be longer than 50 characters.")]
         public string FirstMidName { get; set; }
 
